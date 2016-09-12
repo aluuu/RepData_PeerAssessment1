@@ -8,7 +8,8 @@ output:
 
 ## Loading and preprocessing the data
 
-```{r}
+
+```r
 library(dplyr, warn.conflicts = F)
 library(ggplot2, warn.conflicts = F)
 dataset_archive <- "./activity.zip"
@@ -22,7 +23,8 @@ dataset$date <- as.Date(dataset$date)
 ### Total steps made by day
 
 
-```{r}
+
+```r
 steps_by_date <- dataset %>% filter(!is.na(steps)) %>% group_by(date) %>% summarise(steps=sum(steps))
 ggplot(steps_by_date, aes(x=steps)) +
       geom_histogram(bins=7)  +
@@ -31,12 +33,26 @@ ggplot(steps_by_date, aes(x=steps)) +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, size=6))
 ```
 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+
 ### Mean and median total number of steps taken per day
 
 
-```{r}
+
+```r
 mean(steps_by_date$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(steps_by_date$steps)
+```
+
+```
+## [1] 10765
 ```
 
 
@@ -45,7 +61,8 @@ median(steps_by_date$steps)
 ### Tme series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
 
-```{r}
+
+```r
 steps_by_interval <- dataset %>% filter(!is.na(steps)) %>% group_by(interval) %>% summarise(steps=mean(steps))
 
 ggplot(steps_by_interval, aes(x=interval, y=steps, group=NA)) +
@@ -55,13 +72,23 @@ ggplot(steps_by_interval, aes(x=interval, y=steps, group=NA)) +
       ylim(0, 300)
 ```
 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+
 
 
 ### 5-minute interval, which contains the maximum number of steps, on average across all the days in the dataset
 
 
-```{r}
+
+```r
 filter(steps_by_interval, steps == max(steps_by_interval$steps))
+```
+
+```
+## # A tibble: 1 x 2
+##   interval    steps
+##      <int>    <dbl>
+## 1      835 206.1698
 ```
 
 
@@ -70,8 +97,16 @@ filter(steps_by_interval, steps == max(steps_by_interval$steps))
 ### Total number of missing values in the dataset
 
 
-```{r}
+
+```r
 dataset %>% filter(is.na(steps)) %>% count()
+```
+
+```
+## # A tibble: 1 x 1
+##       n
+##   <int>
+## 1  2304
 ```
 
 
@@ -80,7 +115,8 @@ dataset %>% filter(is.na(steps)) %>% count()
 Replacing missing steps values with either median of steps by aproppriate interval or with the steps mean across original dataset.
 
 
-```{r}
+
+```r
 mean_steps_by_interval <- dataset %>% filter(!is.na(steps)) %>% group_by(interval) %>% summarise(steps=mean(steps))
 mean_steps_by_date <- dataset %>% filter(!is.na(steps)) %>% group_by(date) %>% summarise(steps=mean(steps))
 
@@ -108,13 +144,38 @@ modified_dataset$steps <- modified_dataset$steps_n
 modified_dataset <- subset(modified_dataset, select = -c(steps_n) )
 
 summary(modified_dataset)
+```
+
+```
+##      steps             date               interval     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+##  3rd Qu.: 27.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0
+```
+
+```r
 summary(dataset)
+```
+
+```
+##      steps             date               interval     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+##  3rd Qu.: 12.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
+##  NA's   :2304
 ```
 
 ### Total steps made by day in modified dataset in comparison with the original dataset
 
 
-```{r}
+
+```r
 orig_steps_by_date <- dataset %>% filter(!is.na(steps)) %>% group_by(date) %>% summarise(steps=sum(steps))
 mod_steps_by_date <- modified_dataset %>% group_by(date) %>% summarise(steps=sum(steps))
 orig_steps_by_date$Dataset <- "Original dataset"
@@ -130,25 +191,50 @@ ggplot(ds, mapping=aes(x=steps, fill=Dataset)) +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, size=5), legend.position="bottom")
 ```
 
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
+
 #### Median and mean of total steps made by date in original dataset
 
-```{r}
-median(orig_steps_by_date$steps)
 
+```r
+median(orig_steps_by_date$steps)
+```
+
+```
+## [1] 10765
+```
+
+```r
 mean(orig_steps_by_date$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 #### Median and mean of total steps made by date in modified dataset
 
-```{r}
-median(mod_steps_by_date$steps)
 
+```r
+median(mod_steps_by_date$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 mean(mod_steps_by_date$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r}
+
+```r
 wdays <- ifelse(weekdays(modified_dataset$date) %in% c("Saturday", "Sunday"), "weekend", "weekday")
 modified_dataset$weekday <- as.factor(wdays)
 
@@ -161,3 +247,5 @@ ggplot(mod_steps_by_interval, aes(x=interval, y=steps, group=weekday, color=week
       xlab("Time interval") +
       ylim(0, 300)
 ```
+
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
